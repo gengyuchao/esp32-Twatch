@@ -23,6 +23,8 @@ SOFTWARE.
 
 */
 
+extern "C" {
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -41,8 +43,11 @@ SOFTWARE.
 #include "font8x13.h"
 #include "helpers/wifi.h"
 #include "helpers/nvs.h"
-#include <lvgl_gui/lvgl_main.h>
+#include "lvgl_gui/lvgl_main.h"
 #include "sdkconfig.h"
+
+}
+
 
 static const char *TAG = "main";
 static float fb_fps;
@@ -147,13 +152,101 @@ static void sntp_set_rtc(struct timeval *tv)
 }
 
 
-void app_main()
+#include "bma.hpp"
+bma423_t bma;
+void accel_task(void *params)
+{
+
+    BMA bma423(&bma);
+
+    bma423.begin();
+
+    // Accel parameter structure
+    Acfg cfg;
+    /*!
+        Output data rate in Hz, Optional parameters:
+            - BMA4_OUTPUT_DATA_RATE_0_78HZ
+            - BMA4_OUTPUT_DATA_RATE_1_56HZ
+            - BMA4_OUTPUT_DATA_RATE_3_12HZ
+            - BMA4_OUTPUT_DATA_RATE_6_25HZ
+            - BMA4_OUTPUT_DATA_RATE_12_5HZ
+            - BMA4_OUTPUT_DATA_RATE_25HZ
+            - BMA4_OUTPUT_DATA_RATE_50HZ
+            - BMA4_OUTPUT_DATA_RATE_100HZ
+            - BMA4_OUTPUT_DATA_RATE_200HZ
+            - BMA4_OUTPUT_DATA_RATE_400HZ
+            - BMA4_OUTPUT_DATA_RATE_800HZ
+            - BMA4_OUTPUT_DATA_RATE_1600HZ
+    */
+    cfg.odr = BMA4_OUTPUT_DATA_RATE_100HZ;
+    /*!
+        G-range, Optional parameters:
+            - BMA4_ACCEL_RANGE_2G
+            - BMA4_ACCEL_RANGE_4G
+            - BMA4_ACCEL_RANGE_8G
+            - BMA4_ACCEL_RANGE_16G
+    */
+    cfg.range = BMA4_ACCEL_RANGE_2G;
+    /*!
+        Bandwidth parameter, determines filter configuration, Optional parameters:
+            - BMA4_ACCEL_OSR4_AVG1
+            - BMA4_ACCEL_OSR2_AVG2
+            - BMA4_ACCEL_NORMAL_AVG4
+            - BMA4_ACCEL_CIC_AVG8
+            - BMA4_ACCEL_RES_AVG16
+            - BMA4_ACCEL_RES_AVG32
+            - BMA4_ACCEL_RES_AVG64
+            - BMA4_ACCEL_RES_AVG128
+    */
+    cfg.bandwidth = BMA4_ACCEL_NORMAL_AVG4;
+
+    /*! Filter performance mode , Optional parameters:
+        - BMA4_CIC_AVG_MODE
+        - BMA4_CONTINUOUS_MODE
+    */
+    cfg.perf_mode = BMA4_CONTINUOUS_MODE;
+
+    // Configure the BMA423 accelerometer
+    bma423.accelConfig(cfg);
+
+    // Enable BMA423 accelerometer
+    // Warning : Need to use feature, you must first enable the accelerometer
+    // Warning : Need to use feature, you must first enable the accelerometer
+    // Warning : Need to use feature, you must first enable the accelerometer
+    bma423.enableAccel();
+
+    
+    uint8_t rotation = bma423.direction();
+    while (1) {
+        if(rotation != bma423.direction()){
+          rotation = bma423.direction();
+          ESP_LOGW("BMA","direction:%d",rotation);
+        }
+        Accel acc;
+        // if(btn_flag)
+        {
+        bma423.getAccel(&acc);
+        // draw_wave(0,(acc.x + 1024)/2048.0*DISPLAY_HEIGHT,rgb565(255, 0, 0));
+        // draw_wave(1,(acc.y + 1024)/2048.0*DISPLAY_HEIGHT,rgb565(0, 255, 0));
+        // draw_wave(2,(acc.z + 1024)/2048.0*DISPLAY_HEIGHT,rgb565(0, 0, 255));
+        }
+        ESP_LOGW("BMA","%d,%d,%d",  acc.x,acc.y,acc.z);
+        vTaskDelay(5000/ portTICK_RATE_MS);
+
+    }
+    vTaskDelete(NULL);
+}
+
+
+
+extern "C" void app_main()
 {
     ESP_LOGI(TAG, "SDK version: %s", esp_get_idf_version());
     ESP_LOGI(TAG, "Heap when starting: %d", esp_get_free_heap_size());
 
-    // ESP_LOGI(TAG, "Initializing display");
+    ESP_LOGI(TAG, "Initializing display");
     lvgl_main();
+    vTaskDelay(1000/ portTICK_RATE_MS);
 
     static i2c_port_t i2c_port = I2C_NUM_0;
 
@@ -174,6 +267,10 @@ void app_main()
     pcf.write = &i2c_write;
     pcf.handle = &i2c_port;
 
+    ESP_LOGI(TAG, "Initializing BMA423");
+    bma.read = &i2c_read;
+    bma.write = &i2c_write;
+    bma.handle = &i2c_port;
     
     // hagl_init();
     // hagl_clear_screen();
@@ -197,7 +294,10 @@ void app_main()
 
     ESP_LOGI(TAG, "Heap after init: %d", esp_get_free_heap_size());
 
-    xTaskCreatePinnedToCore(rtc_task, "RTC", 4096*3, NULL, 1, NULL, 1);
+    xTaskCreatePinnedToCore(rtc_task, "RTC", 4096, NULL, 1, NULL, 1);
     xTaskCreatePinnedToCore(log_task, "Log", 4096, NULL, 2, NULL, 1);
+    xTaskCreatePinnedToCore(accel_task, "accel", 4096, NULL, 2, NULL, 1);
     
 }
+
+
