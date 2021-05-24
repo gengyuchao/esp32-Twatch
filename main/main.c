@@ -33,12 +33,7 @@ SOFTWARE.
 #include <freertos/task.h>
 #include <esp_log.h>
 #include <driver/spi_master.h>
-#include <mipi_dcs.h>
-#include <mipi_display.h>
-#include <hagl.h>
-#include <hagl_hal.h>
-#include <fps.h>
-#include <rgb565.h>
+
 #include <i2c_helper.h>
 #include <axp202.h>
 #include <pcf8563.h>
@@ -46,6 +41,7 @@ SOFTWARE.
 #include "font8x13.h"
 #include "helpers/wifi.h"
 #include "helpers/nvs.h"
+#include <lvgl_gui/lvgl_main.h>
 #include "sdkconfig.h"
 
 static const char *TAG = "main";
@@ -56,55 +52,34 @@ axp202_t axp;
 struct tm rtc = {0};
 spi_device_handle_t spi;
 
-/*
-
-Cap refresh rate to 45fps.
-T = 1000 / 45 / (1000 / CONFIG_FREERTOS_HZ)
-
-*/
-void backbuffer_task(void *params)
-{
-    TickType_t last;
-    const TickType_t period = 1000 / 45 / portTICK_RATE_MS;
-
-    last = xTaskGetTickCount();
-
-    while (1) {
-        hagl_flush();
-        fb_fps = fps();
-        vTaskDelayUntil(&last, period);
-    }
-
-    vTaskDelete(NULL);
-}
 
 void rtc_task(void *params)
 {
-    uint16_t color = rgb565(0, 255, 0);
-    char16_t message[128];
+    // uint16_t color = rgb565(0, 255, 0);
+    // char16_t message[128];
 
     /* Calculate tm_yday for the first run. */
     mktime(&rtc);
 
     while (1) {
         pcf8563_read(&pcf, &rtc);
-        swprintf(
-            message,
-            sizeof(message),
-            L"%04d-%02d-%02d",
-            rtc.tm_year + 1900, rtc.tm_mon + 1, rtc.tm_mday
-        );
-        hagl_put_text(message, 80, 100, color, font8x13);
-        // ESP_LOGI(TAG, "%04d-%02d-%02d", rtc.tm_year + 1900, rtc.tm_mon + 1, rtc.tm_mday);
+        // swprintf(
+        //     message,
+        //     sizeof(message),
+        //     L"%04d-%02d-%02d",
+        //     rtc.tm_year + 1900, rtc.tm_mon + 1, rtc.tm_mday
+        // );
+        // hagl_put_text(message, 80, 100, color, font8x13);
+        ESP_LOGI(TAG, "%04d-%02d-%02d", rtc.tm_year + 1900, rtc.tm_mon + 1, rtc.tm_mday);
 
-        swprintf(
-            message,
-            sizeof(message),
-            L"%02d:%02d:%02d",
-            rtc.tm_hour, rtc.tm_min, rtc.tm_sec
-        );
-        hagl_put_text(message, 88, 115, color, font8x13);
-        // ESP_LOGI(TAG, "%02d:%02d:%02d", rtc.tm_hour, rtc.tm_min, rtc.tm_sec);
+        // swprintf(
+        //     message,
+        //     sizeof(message),
+        //     L"%02d:%02d:%02d",
+        //     rtc.tm_hour, rtc.tm_min, rtc.tm_sec
+        // );
+        // hagl_put_text(message, 88, 115, color, font8x13);
+        ESP_LOGI(TAG, "%02d:%02d:%02d", rtc.tm_hour, rtc.tm_min, rtc.tm_sec);
 
         vTaskDelay(1000 / portTICK_RATE_MS);
     }
@@ -171,10 +146,14 @@ static void sntp_set_rtc(struct timeval *tv)
     pcf8563_write(&pcf, time);
 }
 
+
 void app_main()
 {
     ESP_LOGI(TAG, "SDK version: %s", esp_get_idf_version());
     ESP_LOGI(TAG, "Heap when starting: %d", esp_get_free_heap_size());
+
+    // ESP_LOGI(TAG, "Initializing display");
+    lvgl_main();
 
     static i2c_port_t i2c_port = I2C_NUM_0;
 
@@ -195,9 +174,9 @@ void app_main()
     pcf.write = &i2c_write;
     pcf.handle = &i2c_port;
 
-    ESP_LOGI(TAG, "Initializing display");
-    hagl_init();
-    hagl_clear_screen();
+    
+    // hagl_init();
+    // hagl_clear_screen();
 
     ESP_LOGI(TAG, "Initializing non volatile storage");
     nvs_init();
@@ -218,7 +197,7 @@ void app_main()
 
     ESP_LOGI(TAG, "Heap after init: %d", esp_get_free_heap_size());
 
-    xTaskCreatePinnedToCore(rtc_task, "RTC", 2048, NULL, 1, NULL, 1);
+    xTaskCreatePinnedToCore(rtc_task, "RTC", 4096*3, NULL, 1, NULL, 1);
     xTaskCreatePinnedToCore(log_task, "Log", 4096, NULL, 2, NULL, 1);
-    xTaskCreatePinnedToCore(backbuffer_task, "Backbuffer", 8192, NULL, 1, NULL, 0);
+    
 }

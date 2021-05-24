@@ -7,3 +7,4 @@
 #Compile image file into the resulting firmware binary
 #COMPONENT_EMBED_FILES := image.jpg
 COMPONENT_SRCDIRS := . helpers
+CFLAGS+= -DLV_LVGL_H_INCLUDE_SIMPLE
