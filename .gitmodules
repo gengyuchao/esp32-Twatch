@@ -1,15 +1,20 @@
 [submodule "components/axp202"]
 	path = components/axp202
-	url = git@github.com:tuupola/axp202.git
+	url = https://github.com/gengyuchao/axp202.git
 [submodule "components/esp_i2c_helper"]
 	path = components/esp_i2c_helper
-	url = git@github.com:tuupola/esp_i2c_helper.git
+	url = https://github.com/gengyuchao/esp_i2c_helper.git
 [submodule "components/pcf8563"]
 	path = components/pcf8563
-	url = git@github.com:tuupola/pcf8563.git
-[submodule "components/hagl"]
-	path = components/hagl
-	url = git@github.com:tuupola/hagl.git
-[submodule "components/hagl_esp_mipi"]
-	path = components/hagl_esp_mipi
-	url = git@github.com:tuupola/hagl_esp_mipi.git
+	url = https://github.com/gengyuchao/pcf8563.git
+[submodule "lv_examples"]
+	path = components/lv_examples/lv_examples
+	url = https://github.com/littlevgl/lv_examples.git
+	branch = release/v7
+[submodule "components/lvgl_esp32_drivers"]
+	path = components/lvgl_esp32_drivers
+	url = https://github.com/gengyuchao/lvgl_esp32_drivers.git
+[submodule "components/lvgl"]
+	path = components/lvgl
+	url = https://github.com/lvgl/lvgl.git
+
