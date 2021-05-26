@@ -30,6 +30,8 @@
     #endif
 #endif
 
+#include "gui_guider.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -42,6 +44,8 @@
 static void lv_tick_task(void *arg);
 static void guiTask(void *pvParameter);
 static void create_demo_application(void);
+
+lv_ui guider_ui;
 
 /**********************
  *   APPLICATION MAIN
@@ -131,7 +135,9 @@ static void guiTask(void *pvParameter) {
     ESP_ERROR_CHECK(esp_timer_start_periodic(periodic_timer, LV_TICK_PERIOD_MS * 1000));
 
     /* Create the demo application */
-    create_demo_application();
+    // create_demo_application();
+    
+    setup_ui(&guider_ui);
 
     while (1) {
         /* Delay 1 tick (assumes FreeRTOS tick is 10ms */
