@@ -57,6 +57,7 @@ axp202_t axp;
 struct tm rtc = {0};
 spi_device_handle_t spi;
 
+extern "C" void set_ring_as_time(int hour,int minute,int second);
 
 void rtc_task(void *params)
 {
@@ -85,6 +86,8 @@ void rtc_task(void *params)
         // );
         // hagl_put_text(message, 88, 115, color, font8x13);
         ESP_LOGI(TAG, "%02d:%02d:%02d", rtc.tm_hour, rtc.tm_min, rtc.tm_sec);
+        
+        set_ring_as_time(rtc.tm_hour,rtc.tm_min,rtc.tm_sec);
 
         vTaskDelay(1000 / portTICK_RATE_MS);
     }
@@ -283,7 +286,7 @@ extern "C" void app_main()
 
     ESP_LOGI(TAG, "Start SNTP sync");
     /* Set your POSIX timezone here. */
-    setenv("TZ", "EET-3", 1);
+    setenv("TZ", "CST-8", 1);
     tzset();
 
     sntp_setoperatingmode(SNTP_OPMODE_POLL);

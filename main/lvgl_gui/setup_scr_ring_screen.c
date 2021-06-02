@@ -73,9 +73,9 @@ void setup_scr_ring_screen(lv_ui *ui){
 	lv_obj_add_style(ui->ring_screen_ring_big, LV_ARC_PART_INDIC, &style_ring_screen_ring_big_indic);
 	lv_obj_set_pos(ui->ring_screen_ring_big, 0, 0);
 	lv_obj_set_size(ui->ring_screen_ring_big, 240, 240);
-	lv_arc_set_angles(ui->ring_screen_ring_big, 270, 200);
 	lv_arc_set_bg_angles(ui->ring_screen_ring_big, 0, 360);
-	lv_arc_set_rotation(ui->ring_screen_ring_big, 0);
+	lv_arc_set_angles(ui->ring_screen_ring_big, 0, 200);
+	lv_arc_set_rotation(ui->ring_screen_ring_big, 90);
 	lv_obj_set_style_local_pad_top(ui->ring_screen_ring_big, LV_ARC_PART_BG, LV_STATE_DEFAULT, 20);
 	lv_obj_set_style_local_pad_bottom(ui->ring_screen_ring_big, LV_ARC_PART_BG, LV_STATE_DEFAULT, 20);
 	lv_obj_set_style_local_pad_left(ui->ring_screen_ring_big, LV_ARC_PART_BG, LV_STATE_DEFAULT, 20);
@@ -108,9 +108,9 @@ void setup_scr_ring_screen(lv_ui *ui){
 	lv_obj_add_style(ui->ring_screen_ring_medium, LV_ARC_PART_INDIC, &style_ring_screen_ring_medium_indic);
 	lv_obj_set_pos(ui->ring_screen_ring_medium, 22, 22);
 	lv_obj_set_size(ui->ring_screen_ring_medium, 194, 194);
-	lv_arc_set_angles(ui->ring_screen_ring_medium, 270, 180);
 	lv_arc_set_bg_angles(ui->ring_screen_ring_medium, 0, 360);
-	lv_arc_set_rotation(ui->ring_screen_ring_medium, 0);
+	lv_arc_set_angles(ui->ring_screen_ring_medium, 0, 270);
+	lv_arc_set_rotation(ui->ring_screen_ring_medium, 90);
 	lv_obj_set_style_local_pad_top(ui->ring_screen_ring_medium, LV_ARC_PART_BG, LV_STATE_DEFAULT, 20);
 	lv_obj_set_style_local_pad_bottom(ui->ring_screen_ring_medium, LV_ARC_PART_BG, LV_STATE_DEFAULT, 20);
 	lv_obj_set_style_local_pad_left(ui->ring_screen_ring_medium, LV_ARC_PART_BG, LV_STATE_DEFAULT, 20);
@@ -143,11 +143,20 @@ void setup_scr_ring_screen(lv_ui *ui){
 	lv_obj_add_style(ui->ring_screen_ring_small, LV_ARC_PART_INDIC, &style_ring_screen_ring_small_indic);
 	lv_obj_set_pos(ui->ring_screen_ring_small, 46, 46);
 	lv_obj_set_size(ui->ring_screen_ring_small, 146, 146);
-	lv_arc_set_angles(ui->ring_screen_ring_small, 270, 180);
 	lv_arc_set_bg_angles(ui->ring_screen_ring_small, 0, 360);
-	lv_arc_set_rotation(ui->ring_screen_ring_small, 0);
+	lv_arc_set_angles(ui->ring_screen_ring_small, 0, 180);
+	lv_arc_set_rotation(ui->ring_screen_ring_small, 90);
 	lv_obj_set_style_local_pad_top(ui->ring_screen_ring_small, LV_ARC_PART_BG, LV_STATE_DEFAULT, 20);
 	lv_obj_set_style_local_pad_bottom(ui->ring_screen_ring_small, LV_ARC_PART_BG, LV_STATE_DEFAULT, 20);
 	lv_obj_set_style_local_pad_left(ui->ring_screen_ring_small, LV_ARC_PART_BG, LV_STATE_DEFAULT, 20);
 	lv_obj_set_style_local_pad_right(ui->ring_screen_ring_small, LV_ARC_PART_BG, LV_STATE_DEFAULT, 20);
+}
+
+extern lv_ui guider_ui;
+void set_ring_as_time(int hour,int minute,int second)
+{
+	lv_ui *ui = &guider_ui;
+	lv_arc_set_angles(ui->ring_screen_ring_small, 0, hour/24.0*360.0);
+	lv_arc_set_angles(ui->ring_screen_ring_medium, 0, minute/60.0*360.0);
+	lv_arc_set_angles(ui->ring_screen_ring_big, 0, second/60.0*360.0);
 }
