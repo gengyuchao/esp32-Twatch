@@ -89,7 +89,7 @@ void rtc_task(void *params)
         
         set_ring_as_time(rtc.tm_hour,rtc.tm_min,rtc.tm_sec);
 
-        vTaskDelay(1000 / portTICK_RATE_MS);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 
     vTaskDelete(NULL);
@@ -137,7 +137,7 @@ void log_task(void *params)
 //         strftime(buffer, 128 ,"%c (day %j)" , &rtc);
 //         ESP_LOGI(TAG, "RTC: %s", buffer);
 
-        vTaskDelay(10000 / portTICK_RATE_MS);
+        vTaskDelay(10000 / portTICK_PERIOD_MS);
 
         ESP_LOGI(TAG, "fps: %.1f", fb_fps);
     }
@@ -234,7 +234,7 @@ void accel_task(void *params)
         // draw_wave(2,(acc.z + 1024)/2048.0*DISPLAY_HEIGHT,rgb565(0, 0, 255));
         }
         ESP_LOGW("BMA","%d,%d,%d",  acc.x,acc.y,acc.z);
-        vTaskDelay(5000/ portTICK_RATE_MS);
+        vTaskDelay(5000/ portTICK_PERIOD_MS);
 
     }
     vTaskDelete(NULL);
@@ -245,13 +245,13 @@ void accel_task(void *params)
 extern "C" void app_main()
 {
     ESP_LOGI(TAG, "SDK version: %s", esp_get_idf_version());
-    ESP_LOGI(TAG, "Heap when starting: %d", esp_get_free_heap_size());
+    ESP_LOGI(TAG, "Heap when starting: %ld", esp_get_free_heap_size());
 
     ESP_LOGI(TAG, "Initializing display");
     lvgl_main();
-    vTaskDelay(1000/ portTICK_RATE_MS);
+    vTaskDelay(1000/ portTICK_PERIOD_MS);
 
-    static i2c_port_t i2c_port = I2C_NUM_0;
+    static i2c_port_t i2c_port = I2C_NUM_1;
 
     ESP_LOGI(TAG, "Initializing I2C");
     i2c_init(i2c_port);
@@ -295,7 +295,7 @@ extern "C" void app_main()
     sntp_set_time_sync_notification_cb(sntp_set_rtc);
     sntp_init();
 
-    ESP_LOGI(TAG, "Heap after init: %d", esp_get_free_heap_size());
+    ESP_LOGI(TAG, "Heap after init: %ld", esp_get_free_heap_size());
 
     xTaskCreatePinnedToCore(rtc_task, "RTC", 4096, NULL, 1, NULL, 1);
     xTaskCreatePinnedToCore(log_task, "Log", 4096, NULL, 2, NULL, 1);

@@ -63,7 +63,7 @@ static void wifi_event_handler(
         break;
     case WIFI_EVENT_STA_DISCONNECTED:
         ESP_LOGI(TAG, "Got WIFI_EVENT_STA_DISCONNECTED event");
-        vTaskDelay(1000 / portTICK_RATE_MS);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
         esp_wifi_connect();
         break;
     case WIFI_EVENT_STA_AUTHMODE_CHANGE:

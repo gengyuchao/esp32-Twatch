@@ -1,11 +1,19 @@
 
 /**/
+
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_freertos_hooks.h"
 #include "freertos/semphr.h"
 #include "esp_system.h"
 #include "driver/gpio.h"
+#include "esp_timer.h"
+#include "esp_log.h"
 
 /* Littlevgl specific */
 #ifdef LV_LVGL_H_INCLUDE_SIMPLE
@@ -105,6 +113,10 @@ static void guiTask(void *pvParameter) {
     lv_disp_drv_init(&disp_drv);
     disp_drv.flush_cb = disp_driver_flush;
 
+#if defined CONFIG_DISPLAY_ORIENTATION_PORTRAIT || defined CONFIG_DISPLAY_ORIENTATION_PORTRAIT_INVERTED
+    disp_drv.rotated = 1;
+#endif
+
     /* When using a monochrome display we need to register the callbacks:
      * - rounder_cb
      * - set_px_cb */
@@ -135,9 +147,9 @@ static void guiTask(void *pvParameter) {
     ESP_ERROR_CHECK(esp_timer_start_periodic(periodic_timer, LV_TICK_PERIOD_MS * 1000));
 
     /* Create the demo application */
-    // create_demo_application();
+    create_demo_application();
     
-    setup_ui(&guider_ui);
+    // setup_ui(&guider_ui);
 
     while (1) {
         /* Delay 1 tick (assumes FreeRTOS tick is 10ms */
