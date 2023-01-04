@@ -3,7 +3,7 @@
 
 extern "C" {
 static void delay(uint32_t x){
-    vTaskDelay(x/portTICK_RATE_MS);
+    vTaskDelay(x/portTICK_PERIOD_MS);
 } 
 }
 

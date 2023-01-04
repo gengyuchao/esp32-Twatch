@@ -3,4 +3,5 @@ idf_component_register(
     "bma4.c"
     "bma423.c"
     INCLUDE_DIRS "."
+    REQUIRES driver
 )
