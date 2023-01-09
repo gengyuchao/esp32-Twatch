@@ -251,56 +251,59 @@ extern "C" void app_main()
     lvgl_main();
     vTaskDelay(1000/ portTICK_PERIOD_MS);
 
-    static i2c_port_t i2c_port = I2C_NUM_1;
+    // static i2c_port_t i2c_port = I2C_NUM_1;
 
-    ESP_LOGI(TAG, "Initializing I2C");
-    i2c_init(i2c_port);
+    // ESP_LOGI(TAG, "Initializing I2C");
+    // i2c_init(i2c_port);
 
-    ESP_LOGI(TAG, "Initializing AXP202");
-    axp.read = &i2c_read;
-    axp.write = &i2c_write;
-    axp.handle = &i2c_port;
+    // ESP_LOGI(TAG, "Initializing AXP202");
+    // axp.read = &i2c_read;
+    // axp.write = &i2c_write;
+    // axp.handle = &i2c_port;
 
-    axp202_init(&axp);
-    // AXP202_ioctl(&axp, AXP202_COULOMB_COUNTER_ENABLE, NULL);
-    // AXP202_ioctl(&axp, AXP202_COULOMB_COUNTER_CLEAR, NULL);
+    // axp202_init(&axp);
+    // // AXP202_ioctl(&axp, AXP202_COULOMB_COUNTER_ENABLE, NULL);
+    // // AXP202_ioctl(&axp, AXP202_COULOMB_COUNTER_CLEAR, NULL);
 
-    ESP_LOGI(TAG, "Initializing PCF8563");
-    pcf.read = &i2c_read;
-    pcf.write = &i2c_write;
-    pcf.handle = &i2c_port;
+    // ESP_LOGI(TAG, "Initializing PCF8563");
+    // pcf.read = &i2c_read;
+    // pcf.write = &i2c_write;
+    // pcf.handle = &i2c_port;
 
-    ESP_LOGI(TAG, "Initializing BMA423");
-    bma.read = &i2c_read;
-    bma.write = &i2c_write;
-    bma.handle = &i2c_port;
+    // ESP_LOGI(TAG, "Initializing BMA423");
+    // bma.read = &i2c_read;
+    // bma.write = &i2c_write;
+    // bma.handle = &i2c_port;
     
-    // hagl_init();
-    // hagl_clear_screen();
+    // // hagl_init();
+    // // hagl_clear_screen();
 
-    ESP_LOGI(TAG, "Initializing non volatile storage");
-    nvs_init();
+    // ESP_LOGI(TAG, "Initializing non volatile storage");
+    // nvs_init();
 
-    ESP_LOGI(TAG, "Initializing wifi");
-    wifi_init();
+    // ESP_LOGI(TAG, "Initializing wifi");
+    // wifi_init();
 
-    ESP_LOGI(TAG, "Start SNTP sync");
-    /* Set your POSIX timezone here. */
-    setenv("TZ", "CST-8", 1);
-    tzset();
+    // ESP_LOGI(TAG, "Start SNTP sync");
+    // /* Set your POSIX timezone here. */
+    // setenv("TZ", "CST-8", 1);
+    // tzset();
 
-    sntp_setoperatingmode(SNTP_OPMODE_POLL);
-    sntp_setservername(0, "pool.ntp.org");
-    sntp_set_sync_mode(SNTP_SYNC_MODE_IMMED);
-    sntp_set_time_sync_notification_cb(sntp_set_rtc);
-    sntp_init();
+    // sntp_setoperatingmode(SNTP_OPMODE_POLL);
+    // sntp_setservername(0, "pool.ntp.org");
+    // sntp_set_sync_mode(SNTP_SYNC_MODE_IMMED);
+    // sntp_set_time_sync_notification_cb(sntp_set_rtc);
+    // sntp_init();
 
-    ESP_LOGI(TAG, "Heap after init: %ld", esp_get_free_heap_size());
+    // ESP_LOGI(TAG, "Heap after init: %ld", esp_get_free_heap_size());
 
-    xTaskCreatePinnedToCore(rtc_task, "RTC", 4096, NULL, 1, NULL, 1);
-    xTaskCreatePinnedToCore(log_task, "Log", 4096, NULL, 2, NULL, 1);
-    xTaskCreatePinnedToCore(accel_task, "accel", 4096, NULL, 2, NULL, 1);
-    
+    // xTaskCreatePinnedToCore(rtc_task, "RTC", 4096, NULL, 1, NULL, 1);
+    // xTaskCreatePinnedToCore(log_task, "Log", 4096, NULL, 2, NULL, 1);
+    // xTaskCreatePinnedToCore(accel_task, "accel", 4096, NULL, 2, NULL, 1);
+
+    void http_ota_main(void);
+    http_ota_main();
+
 }
 
 
