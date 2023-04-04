@@ -32,8 +32,8 @@ void setup_scr_ring_screen(lv_ui *ui){
 	lv_style_set_bg_grad_color(&style_ring_screen_ring_container_main, LV_STATE_DEFAULT, lv_color_make(0x00, 0x00, 0x00));
 	lv_style_set_bg_grad_dir(&style_ring_screen_ring_container_main, LV_STATE_DEFAULT, LV_GRAD_DIR_VER);
 	lv_style_set_bg_opa(&style_ring_screen_ring_container_main, LV_STATE_DEFAULT, 255);
-	lv_style_set_border_color(&style_ring_screen_ring_container_main, LV_STATE_DEFAULT, lv_color_make(0x99, 0x99, 0x99));
-	lv_style_set_border_width(&style_ring_screen_ring_container_main, LV_STATE_DEFAULT, 1);
+	lv_style_set_border_color(&style_ring_screen_ring_container_main, LV_STATE_DEFAULT, lv_color_make(0xff, 0xff, 0xff));
+	lv_style_set_border_width(&style_ring_screen_ring_container_main, LV_STATE_DEFAULT, 0);
 	lv_style_set_border_opa(&style_ring_screen_ring_container_main, LV_STATE_DEFAULT, 255);
 	lv_style_set_pad_left(&style_ring_screen_ring_container_main, LV_STATE_DEFAULT, 0);
 	lv_style_set_pad_right(&style_ring_screen_ring_container_main, LV_STATE_DEFAULT, 0);
@@ -70,6 +70,10 @@ void setup_scr_ring_screen(lv_ui *ui){
 	//Write style state: LV_STATE_DEFAULT for style_ring_screen_ring_big_indic
 	lv_style_set_line_color(&style_ring_screen_ring_big_indic, LV_STATE_DEFAULT, lv_color_make(0xff, 0x0f, 0x51));
 	lv_style_set_line_width(&style_ring_screen_ring_big_indic, LV_STATE_DEFAULT, 16);
+	lv_style_set_shadow_width(&style_ring_screen_ring_big_indic, LV_STATE_DEFAULT, 8);
+	lv_style_set_shadow_color(&style_ring_screen_ring_big_indic, LV_STATE_DEFAULT, LV_COLOR_BLUE);
+	lv_style_set_shadow_ofs_x(&style_ring_screen_ring_big_indic, LV_STATE_DEFAULT, 3);
+    lv_style_set_shadow_ofs_y(&style_ring_screen_ring_big_indic, LV_STATE_DEFAULT, 3);
 	lv_obj_add_style(ui->ring_screen_ring_big, LV_ARC_PART_INDIC, &style_ring_screen_ring_big_indic);
 	lv_obj_set_pos(ui->ring_screen_ring_big, 0, 0);
 	lv_obj_set_size(ui->ring_screen_ring_big, 240, 240);
@@ -156,7 +160,15 @@ extern lv_ui guider_ui;
 void set_ring_as_time(int hour,int minute,int second)
 {
 	lv_ui *ui = &guider_ui;
-	lv_arc_set_angles(ui->ring_screen_ring_small, 0, hour/24.0*360.0);
+	lv_arc_set_angles(ui->ring_screen_ring_small, 0, (hour%12)/12.0*360.0);
 	lv_arc_set_angles(ui->ring_screen_ring_medium, 0, minute/60.0*360.0);
 	lv_arc_set_angles(ui->ring_screen_ring_big, 0, second/60.0*360.0);
+}
+
+void set_ring_values(int ring_big,int ring_medium,int ring_small)
+{
+	lv_ui *ui = &guider_ui;
+	lv_arc_set_angles(ui->ring_screen_ring_small, 0, ring_small);
+	lv_arc_set_angles(ui->ring_screen_ring_medium, 0, ring_medium);
+	lv_arc_set_angles(ui->ring_screen_ring_big, 0, ring_big);
 }

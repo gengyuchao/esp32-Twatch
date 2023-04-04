@@ -58,11 +58,13 @@ struct tm rtc = {0};
 spi_device_handle_t spi;
 
 extern "C" void set_ring_as_time(int hour,int minute,int second);
-
+extern "C" void set_ring_values(int ring_big,int ring_medium,int ring_small);
 void rtc_task(void *params)
 {
     // uint16_t color = rgb565(0, 255, 0);
     // char16_t message[128];
+
+    int i = 0;
 
     /* Calculate tm_yday for the first run. */
     mktime(&rtc);
@@ -87,7 +89,11 @@ void rtc_task(void *params)
         // hagl_put_text(message, 88, 115, color, font8x13);
         ESP_LOGI(TAG, "%02d:%02d:%02d", rtc.tm_hour, rtc.tm_min, rtc.tm_sec);
         
-        set_ring_as_time(rtc.tm_hour,rtc.tm_min,rtc.tm_sec);
+        
+
+        // set_ring_as_time(rtc.tm_hour,rtc.tm_min,rtc.tm_sec);
+        // set_ring_values(i%360,rtc.tm_min*6,rtc.tm_hour*30);
+        // i += 2;
 
         vTaskDelay(1000 / portTICK_RATE_MS);
     }
@@ -281,6 +287,10 @@ extern "C" void app_main()
     ESP_LOGI(TAG, "Initializing non volatile storage");
     nvs_init();
 
+    xTaskCreatePinnedToCore(rtc_task, "RTC", 4096, NULL, 1, NULL, 1);
+    xTaskCreatePinnedToCore(log_task, "Log", 4096, NULL, 2, NULL, 1);
+    xTaskCreatePinnedToCore(accel_task, "accel", 4096, NULL, 2, NULL, 1);
+    
     ESP_LOGI(TAG, "Initializing wifi");
     wifi_init();
 
@@ -297,9 +307,7 @@ extern "C" void app_main()
 
     ESP_LOGI(TAG, "Heap after init: %d", esp_get_free_heap_size());
 
-    xTaskCreatePinnedToCore(rtc_task, "RTC", 4096, NULL, 1, NULL, 1);
-    xTaskCreatePinnedToCore(log_task, "Log", 4096, NULL, 2, NULL, 1);
-    xTaskCreatePinnedToCore(accel_task, "accel", 4096, NULL, 2, NULL, 1);
+
     
 }
 
